@@ -6,6 +6,14 @@
 #include "GameFramework/Character.h"
 #include "BaseUnit.generated.h"
 
+UENUM(BlueprintType)
+enum class ETeam : uint8
+{
+	Neutral     UMETA(DisplayName = "Neutral"),
+	Player      UMETA(DisplayName = "Necromancer Ally"),
+	Enemy       UMETA(DisplayName = "Enemy")
+};
+
 UCLASS()
 class THEETERNALLEGION_API ABaseUnit : public ACharacter
 {
@@ -16,10 +24,25 @@ public:
 	ABaseUnit();
 
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Stats")
+	ETeam CurrentTeam;
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Legion | Events")
+	void OnTeamChanged(ETeam NewTeam);
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
+	// The main function to call when converting a unit
+	UFUNCTION(BlueprintCallable, Category = "Legion | Actions")
+	void SetTeam(ETeam NewTeam);
+
+	// Getter for other systems to check allegiance
+	UFUNCTION(BlueprintCallable, Category = "Legion | Stats")
+	ETeam GetTeam() const { return CurrentTeam; }
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

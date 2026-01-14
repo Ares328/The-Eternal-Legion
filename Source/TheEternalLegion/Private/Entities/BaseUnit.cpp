@@ -32,3 +32,17 @@ void ABaseUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void ABaseUnit::SetTeam(ETeam NewTeam)
+{
+	if (CurrentTeam != NewTeam)
+	{
+		CurrentTeam = NewTeam;
+		OnTeamChanged(NewTeam);
+	}
+}
+
+void ABaseUnit::OnTeamChanged_Implementation(ETeam NewTeam)
+{
+	// Default implementation
+}
+
