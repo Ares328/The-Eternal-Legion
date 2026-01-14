@@ -3,6 +3,13 @@
 
 #include "Entities/Necromancer.h"
 
+ANecromancer::ANecromancer()
+{
+    CurrentTeam = ETeam::Player;
+
+    ConversionRange = 1000.0f;
+}
+
 void ANecromancer::ConvertUnit(ABaseUnit* TargetUnit)
 {
     FVector Start = GetActorLocation();

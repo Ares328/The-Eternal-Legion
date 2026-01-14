@@ -9,6 +9,9 @@ ABaseUnit::ABaseUnit()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Default team enemy
+	CurrentTeam = ETeam::Enemy;
+
 }
 
 // Called when the game starts or when spawned
@@ -41,8 +44,11 @@ void ABaseUnit::SetTeam(ETeam NewTeam)
 	}
 }
 
-void ABaseUnit::OnTeamChanged_Implementation(ETeam NewTeam)
+void ABaseUnit::OnTeamChanged(ETeam NewTeam)
 {
-	// Default implementation
+	if (NewTeam == ETeam::Player)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%s joined the Legion!"), *GetName()));
+	}
 }
 

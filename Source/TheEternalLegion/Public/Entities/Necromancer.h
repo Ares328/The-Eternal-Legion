@@ -14,6 +14,9 @@ class THEETERNALLEGION_API ANecromancer : public ABaseUnit
 {
 	GENERATED_BODY()
 
+public:
+	ANecromancer();
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Abilities")
 	TSubclassOf<class ABaseUnit> MinionClass;
