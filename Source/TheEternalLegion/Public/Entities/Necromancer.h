@@ -6,6 +6,7 @@
 #include "Entities/BaseUnit.h"
 #include "Necromancer.generated.h"
 
+class UMovementStrategy;
 /**
  * 
  */
@@ -29,6 +30,12 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Legion | Abilities")
 	void ConvertTarget();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Legion | Movement", meta = (AllowPrivateAccess = "true"))
+	UMovementStrategy* MovementStrategy;
+
+	void MoveForward(float Value);
+	void MoveRight(float Value);
 	
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
