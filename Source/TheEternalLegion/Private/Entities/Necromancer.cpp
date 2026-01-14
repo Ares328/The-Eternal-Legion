@@ -10,7 +10,7 @@ ANecromancer::ANecromancer()
     ConversionRange = 1000.0f;
 }
 
-void ANecromancer::ConvertUnit(ABaseUnit* TargetUnit)
+void ANecromancer::ConvertTarget()
 {
     FVector Start = GetActorLocation();
     FVector ForwardVector = GetActorForwardVector();
@@ -59,4 +59,10 @@ void ANecromancer::SummonMinion()
 void ANecromancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+    // Bind 'R' to Summon
+    PlayerInputComponent->BindAction("Summon", IE_Pressed, this, &ANecromancer::SummonMinion);
+
+    // Bind 'E' to Convert
+    PlayerInputComponent->BindAction("Convert", IE_Pressed, this, &ANecromancer::ConvertTarget);
 }

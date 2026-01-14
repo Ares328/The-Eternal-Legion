@@ -28,7 +28,7 @@ protected:
 	float ConversionRange;
 
 	UFUNCTION(BlueprintCallable, Category = "Legion | Abilities")
-	void ConvertUnit(ABaseUnit* TargetUnit);
+	void ConvertTarget();
 	
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
