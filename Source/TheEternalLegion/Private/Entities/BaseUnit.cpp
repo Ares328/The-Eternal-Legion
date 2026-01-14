@@ -44,7 +44,7 @@ void ABaseUnit::SetTeam(ETeam NewTeam)
 	}
 }
 
-void ABaseUnit::OnTeamChanged(ETeam NewTeam)
+void ABaseUnit::OnTeamChanged_Implementation(ETeam NewTeam)
 {
 	if (NewTeam == ETeam::Player)
 	{
