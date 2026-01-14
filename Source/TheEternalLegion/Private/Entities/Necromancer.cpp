@@ -72,6 +72,7 @@ void ANecromancer::MoveRight(float Value)
     {
         MovementStrategy->Move(0.0f, Value);
     }
+}
 
 void ANecromancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
