@@ -16,15 +16,6 @@ class THEETERNALLEGION_API ANecromancer : public ABaseUnit
 public:
 	ANecromancer();
 
-private:
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Legion | Input", meta = (AllowPrivateAccess = "true"))
-	UInputProcessorComponent* InputProcessor;
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Abilities")
-	TSubclassOf<class ABaseUnit> MinionClass;
-
 	UFUNCTION(BlueprintCallable, Category = "Legion | Abilities")
 	void SummonMinion();
 
@@ -33,6 +24,15 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Legion | Abilities")
 	void ConvertTarget();
+
+private:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Legion | Input", meta = (AllowPrivateAccess = "true"))
+	UInputProcessorComponent* InputProcessor;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Abilities")
+	TSubclassOf<class ABaseUnit> MinionClass;
 	
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

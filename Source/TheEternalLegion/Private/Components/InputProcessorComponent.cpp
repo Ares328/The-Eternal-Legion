@@ -61,6 +61,15 @@ void UInputProcessorComponent::SetupInputBindings()
         {
             EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &UInputProcessorComponent::HandleLookInput);
         }
+        if (IA_Summon)
+        {
+            EnhancedInputComponent->BindAction(IA_Summon, ETriggerEvent::Started, this, &UInputProcessorComponent::HandleSummon);
+        }
+
+        if (IA_Convert)
+        {
+            EnhancedInputComponent->BindAction(IA_Convert, ETriggerEvent::Started, this, &UInputProcessorComponent::HandleConvert);
+        }
     }
 }
 
@@ -126,5 +135,21 @@ void UInputProcessorComponent::HandleLookInput(const FInputActionValue& Value)
         // Apply yaw (turn) and pitch (look up/down) input
         OwnerCharacter->AddControllerYawInput(LookVector.X);
         OwnerCharacter->AddControllerPitchInput(LookVector.Y);
+    }
+}
+
+void UInputProcessorComponent::HandleSummon()
+{
+    if (ANecromancer* Owner = Cast<ANecromancer>(GetOwner()))
+    {
+        Owner->SummonMinion();
+    }
+}
+
+void UInputProcessorComponent::HandleConvert()
+{
+    if (ANecromancer* Owner = Cast<ANecromancer>(GetOwner()))
+    {
+        Owner->ConvertTarget();
     }
 }

@@ -24,7 +24,7 @@ private:
     ANecromancer* OwnerCharacter;
 
 protected:
-    UPROPERTY(EditDefaultsOnly, Category = "Legion | Input |Actions")
+    UPROPERTY(EditDefaultsOnly, Category = "Legion | Input | Actions")
     UInputAction* MoveAction;
 
     UPROPERTY(EditDefaultsOnly, Category = "Legion | Input | Actions")
@@ -33,12 +33,21 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Legion | Input | Actions")
     UInputAction* LookAction;
 
+    UPROPERTY(EditAnywhere, Category = "Legion | Input | Actions")
+    UInputAction* IA_Summon;
+
+    UPROPERTY(EditAnywhere, Category = "Legion | Input | Actions")
+    UInputAction* IA_Convert;
+
     UPROPERTY(EditDefaultsOnly, Category = "Legion | Input | Actions")
     class UInputMappingContext* DefaultIMC;
 
     void HandleMoveInput(const FInputActionValue& Value);
     void HandleJumpInput(const FInputActionValue& Value);
     void HandleLookInput(const FInputActionValue& Value);
+
+    void HandleSummon();
+    void HandleConvert();
 
     void SetupInputBindings();
 };
