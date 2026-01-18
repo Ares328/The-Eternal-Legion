@@ -16,5 +16,5 @@ class THEETERNALLEGION_API UPlayerMovementStrategy : public UMovementStrategy
 	
 public:
 
-	virtual void Move(float ForwardValue, float RightValue) override;
+	virtual void ExecuteMovement(ABaseUnit* Owner, const FVector& Direction) override;
 };

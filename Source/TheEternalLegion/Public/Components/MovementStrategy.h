@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "MovementStrategy.generated.h"
 
+class ABaseUnit;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEETERNALLEGION_API UMovementStrategy : public UActorComponent
@@ -21,7 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual void Move(float ForwardValue, float RightValue) {}
+	virtual void ExecuteMovement(ABaseUnit* Owner, const FVector& Direction) {}
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

@@ -1,12 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputAction.h"
 #include "Entities/Necromancer.h"
 #include "Components/PlayerMovementStrategy.h"
+#include "Components/InputProcessorComponent.h"
 
 ANecromancer::ANecromancer()
 {
     MovementStrategy = CreateDefaultSubobject<UPlayerMovementStrategy>(TEXT("MovementStrategy"));
+    InputProcessor = CreateDefaultSubobject<UInputProcessorComponent>(TEXT("InputProcessor"));
     CurrentTeam = ETeam::Player;
 
     ConversionRange = 1000.0f;
@@ -58,28 +62,9 @@ void ANecromancer::SummonMinion()
     }
 }
 
-void ANecromancer::MoveForward(float Value)
-{
-    if (MovementStrategy && Value != 0.0f)
-    {
-        MovementStrategy->Move(Value, 0.0f);
-    }
-}
-
-void ANecromancer::MoveRight(float Value)
-{
-    if (MovementStrategy && Value != 0.0f)
-    {
-        MovementStrategy->Move(0.0f, Value);
-    }
-}
-
 void ANecromancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-    PlayerInputComponent->BindAxis("MoveForward", this, &ANecromancer::MoveForward);
-    PlayerInputComponent->BindAxis("MoveRight", this, &ANecromancer::MoveRight);
 
     // Bind 'R' to Summon
     PlayerInputComponent->BindAction("Summon", IE_Pressed, this, &ANecromancer::SummonMinion);

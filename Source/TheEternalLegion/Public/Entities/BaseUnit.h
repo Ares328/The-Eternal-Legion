@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/MovementStrategy.h"
 #include "BaseUnit.generated.h"
 
 UENUM(BlueprintType)
@@ -31,6 +32,9 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Legion | Events")
 	void OnTeamChanged(ETeam NewTeam);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Legion | Movement", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UMovementStrategy> MovementStrategy;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -42,6 +46,8 @@ public:
 	// Getter for other systems to check allegiance
 	UFUNCTION(BlueprintCallable, Category = "Legion | Stats")
 	ETeam GetTeam() const { return CurrentTeam; }
+
+	UMovementStrategy* GetMovementStrategy() const { return MovementStrategy.Get(); }
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
