@@ -61,15 +61,3 @@ void ANecromancer::SummonMinion()
         }
     }
 }
-
-void ANecromancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-    UE_LOG(LogTemp, Error, TEXT("Player Input component setting up!"));
-
-    // Bind 'R' to Summon
-    PlayerInputComponent->BindAction("Summon", IE_Pressed, this, &ANecromancer::SummonMinion);
-
-    // Bind 'E' to Convert
-    PlayerInputComponent->BindAction("Convert", IE_Pressed, this, &ANecromancer::ConvertTarget);
-}

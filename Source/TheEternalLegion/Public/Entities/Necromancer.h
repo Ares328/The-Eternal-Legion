@@ -33,7 +33,4 @@ private:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Abilities")
 	TSubclassOf<class ABaseUnit> MinionClass;
-	
-public:
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };

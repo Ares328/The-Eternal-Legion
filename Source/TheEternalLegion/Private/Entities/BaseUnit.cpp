@@ -28,13 +28,6 @@ void ABaseUnit::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void ABaseUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
 void ABaseUnit::SetTeam(ETeam NewTeam)
 {
 	if (CurrentTeam != NewTeam)
