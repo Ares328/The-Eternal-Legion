@@ -7,6 +7,7 @@
 #include "Necromancer.generated.h"
 
 class UInputProcessorComponent;
+class AAIController;
 
 UCLASS()
 class THEETERNALLEGION_API ANecromancer : public ABaseUnit

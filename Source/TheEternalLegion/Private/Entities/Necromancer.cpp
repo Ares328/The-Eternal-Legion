@@ -5,6 +5,7 @@
 #include "InputAction.h"
 #include "Entities/Necromancer.h"
 #include "Components/PlayerMovementStrategy.h"
+#include "AIController.h"
 #include "Components/InputProcessorComponent.h"
 
 ANecromancer::ANecromancer()
@@ -58,6 +59,15 @@ void ANecromancer::SummonMinion()
         {
             NewMinion->SetTeam(ETeam::Player);
             GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Purple, TEXT("Minion Summoned!"));
+
+            if (AAIController* AIC = Cast<AAIController>(NewMinion->GetController()))
+            {
+                // Option A: Move to the Necromancer (Follow)
+                AIC->MoveToActor(this, 50.0f); // 50.0f is the "Acceptance Radius"
+
+                // Option B: Move to a specific point (Target Location)
+                // AIC->MoveToLocation(TargetLocation);
+            }
         }
     }
 }
