@@ -37,12 +37,12 @@ void UMinionMovementStrategy::UpdateMovement(ABaseUnit* Unit, ABaseUnit* Target)
 		DistSq,
 		AcceptanceRadius
 	);
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		0.2f,
-		FColor::Cyan,
-		DebugMsg
-	);
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,
+	//	0.2f,
+	//	FColor::Cyan,
+	//	DebugMsg
+	//);
 
 	if (MinionState == EMinionState::Following)
 	{
