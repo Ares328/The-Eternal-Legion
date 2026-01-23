@@ -15,6 +15,16 @@ AMinion::AMinion()
 	CurrentState = EMinionState::Idle;
 	OwnerUnit = nullptr;
 	CurrentTarget = nullptr;
+
+	DetectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DetectionSphere"));
+	DetectionSphere->SetupAttachment(RootComponent);
+	DetectionSphere->SetSphereRadius(AggroRange);
+	DetectionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	DetectionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+	DetectionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+	DetectionSphere->OnComponentBeginOverlap.AddDynamic(this, &AMinion::OnDetectionBeginOverlap);
+	DetectionSphere->OnComponentEndOverlap.AddDynamic(this, &AMinion::OnDetectionEndOverlap);
 }
 
 void AMinion::OnTeamChanged_Implementation(ETeam NewTeam)
@@ -71,11 +81,93 @@ void AMinion::SetCurrentTarget(ABaseUnit* NewTarget)
 	}
 }
 
+void AMinion::SetAggroRange(float NewRange)
+{
+	AggroRange = NewRange;
+
+	if (DetectionSphere)
+	{
+		DetectionSphere->SetSphereRadius(AggroRange);
+	}
+}
+
 void AMinion::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (MovementStrategy)
+
+	if (!MovementStrategy) return;
+
+	if (CurrentTarget)
 	{
 		MovementStrategy->UpdateMovement(this, CurrentTarget);
+	}
+	else if (OwnerUnit)
+	{
+		MovementStrategy->UpdateMovement(this, OwnerUnit);
+	}
+}
+
+void AMinion::OnDetectionBeginOverlap(
+	UPrimitiveComponent* OverlappedComp,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult
+)
+{
+	if (!OtherActor || OtherActor == this)
+	{
+		return;
+	}
+
+	ABaseUnit* OtherUnit = Cast<ABaseUnit>(OtherActor);
+	if (!OtherUnit)
+	{
+		return;
+	}
+
+	// Only enemies
+	if (OtherUnit->GetTeam() == GetTeam())
+	{
+		return;
+	}
+
+	if (CurrentTarget && CurrentTarget != OwnerUnit)
+	{
+		return;
+	}
+
+	SetCurrentTarget(OtherUnit);
+}
+
+void AMinion::OnDetectionEndOverlap(
+	UPrimitiveComponent* OverlappedComp,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex
+)
+{
+	if (!OtherActor)
+	{
+		return;
+	}
+
+	ABaseUnit* OtherUnit = Cast<ABaseUnit>(OtherActor);
+	if (!OtherUnit)
+	{
+		return;
+	}
+
+	if (CurrentTarget == OtherUnit)
+	{
+		if (OwnerUnit)
+		{
+			SetCurrentTarget(OwnerUnit);
+		}
+		else
+		{
+			SetCurrentTarget(nullptr);
+		}
 	}
 }

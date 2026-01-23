@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Entities/BaseUnit.h"
+#include "Components/SphereComponent.h"
 #include "Minion.generated.h"
 
 UENUM(BlueprintType)
@@ -38,6 +39,27 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Legion | AI")
 	TObjectPtr<ABaseUnit> CurrentTarget;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Legion | AI")
+	TObjectPtr<USphereComponent> DetectionSphere;
+
+	UFUNCTION()
+	void OnDetectionBeginOverlap(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult
+	);
+
+	UFUNCTION()
+	void OnDetectionEndOverlap(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex
+	);
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Legion | AI")
 	void SetState(EMinionState NewState);
@@ -59,6 +81,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Legion | AI")
 	float GetAggroRange() const { return AggroRange; }
+
+	UFUNCTION(BlueprintCallable, Category = "Legion | AI")
+	void SetAggroRange(float NewRange);
 
 	virtual void Tick(float DeltaTime) override;
 };
