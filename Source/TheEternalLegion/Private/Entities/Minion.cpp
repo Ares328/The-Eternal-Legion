@@ -3,6 +3,9 @@
 
 #include "Entities/Minion.h"
 #include "Components/MinionMovementStrategy.h"
+#include "Components/SphereComponent.h"
+#include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
 
 AMinion::AMinion()
 {
@@ -25,6 +28,10 @@ AMinion::AMinion()
 
 	DetectionSphere->OnComponentBeginOverlap.AddDynamic(this, &AMinion::OnDetectionBeginOverlap);
 	DetectionSphere->OnComponentEndOverlap.AddDynamic(this, &AMinion::OnDetectionEndOverlap);
+
+	AttackRange = 150.0f;
+	AttackDamage = 10.0f;
+	AttackInterval = 1.0f;
 }
 
 void AMinion::OnTeamChanged_Implementation(ETeam NewTeam)
@@ -40,7 +47,19 @@ void AMinion::SetState(EMinionState NewState)
 		return;
 	}
 
+	// Handle exit of old state
+	if (CurrentState == EMinionState::Attacking)
+	{
+		StopAttack();
+	}
+
 	CurrentState = NewState;
+
+	// Handle enter of new state
+	if (CurrentState == EMinionState::Attacking)
+	{
+		StartAttack();
+	}
 }
 
 void AMinion::SetOwnerUnit(ABaseUnit* NewOwner)
@@ -170,4 +189,73 @@ void AMinion::OnDetectionEndOverlap(
 			SetCurrentTarget(nullptr);
 		}
 	}
+}
+
+void AMinion::StartAttack()
+{
+	if (AttackInterval <= 0.0f)
+	{
+		return;
+	}
+
+	GetWorldTimerManager().SetTimer(
+		AttackTimerHandle,
+		this,
+		&AMinion::PerformAttack,
+		AttackInterval,
+		true,
+		0.0f
+	);
+}
+
+void AMinion::StopAttack()
+{
+	if (AttackTimerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+	}
+}
+
+void AMinion::PerformAttack()
+{
+	if (CurrentState != EMinionState::Attacking || !CurrentTarget)
+	{
+		return;
+	}
+
+	if (CurrentTarget->IsDead())
+	{
+		if (OwnerUnit)
+		{
+			SetCurrentTarget(OwnerUnit);
+		}
+		else
+		{
+			SetCurrentTarget(nullptr);
+		}
+		return;
+	}
+
+	const float DistSq = FVector::DistSquared(GetActorLocation(), CurrentTarget->GetActorLocation());
+	if (DistSq > FMath::Square(AttackRange))
+	{
+		return;
+	}
+
+	CurrentTarget->ApplyDamage(AttackDamage, this);
+
+	#if WITH_EDITOR
+		if (GEngine)
+		{
+			const FString Msg = FString::Printf(
+				TEXT("Minion %s attacked %s for %.1f damage (HP: %.1f / %.1f)"),
+				*GetName(),
+				*CurrentTarget->GetName(),
+				AttackDamage,
+				CurrentTarget->GetCurrentHealth(),
+				CurrentTarget->GetMaxHealth()
+			);
+			GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, Msg);
+		}
+	#endif
 }

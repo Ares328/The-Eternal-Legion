@@ -60,6 +60,23 @@ protected:
 		int32 OtherBodyIndex
 	);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Combat")
+	float AttackRange = 150.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Combat")
+	float AttackDamage = 10.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Combat")
+	float AttackInterval = 1.0f;
+
+	FTimerHandle AttackTimerHandle;
+
+	UFUNCTION()
+	void PerformAttack();
+
+	void StartAttack();
+	void StopAttack();
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Legion | AI")
 	void SetState(EMinionState NewState);

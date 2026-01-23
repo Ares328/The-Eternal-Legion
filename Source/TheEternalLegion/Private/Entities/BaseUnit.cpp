@@ -45,3 +45,41 @@ void ABaseUnit::OnTeamChanged_Implementation(ETeam NewTeam)
 	}
 }
 
+void ABaseUnit::ApplyDamage(float DamageAmount, ABaseUnit* DamageCauser)
+{
+	if (bIsDead || DamageAmount <= 0.0f)
+	{
+		return;
+	}
+
+	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.0f, MaxHealth);
+
+	if (CurrentHealth <= 0.0f)
+	{
+		HandleDeath();
+	}
+}
+
+void ABaseUnit::Heal(float HealAmount)
+{
+	if (bIsDead || HealAmount <= 0.0f)
+	{
+		return;
+	}
+
+	CurrentHealth = FMath::Clamp(CurrentHealth + HealAmount, 0.0f, MaxHealth);
+}
+
+void ABaseUnit::HandleDeath()
+{
+	if (bIsDead)
+	{
+		return;
+	}
+
+	bIsDead = true;
+
+	OnUnitDeath.Broadcast(this);
+
+	SetLifeSpan(5.0f);
+}
