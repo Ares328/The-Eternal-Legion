@@ -8,7 +8,7 @@
 
 class ABaseUnit;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, DefaultToInstanced)
 class THEETERNALLEGION_API UMovementStrategy : public UActorComponent
 {
 	GENERATED_BODY()
@@ -23,6 +23,8 @@ protected:
 
 public:
 	virtual void ExecuteMovement(ABaseUnit* Owner, const FVector& Direction) {}
+
+	virtual void UpdateMovement(ABaseUnit* Unit, ABaseUnit* Target) {}
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

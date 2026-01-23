@@ -32,7 +32,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Legion | Events")
 	void OnTeamChanged(ETeam NewTeam);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Legion | Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Legion | Movement", Instanced)
 	TObjectPtr<UMovementStrategy> MovementStrategy;
 
 	// Called when the game starts or when spawned

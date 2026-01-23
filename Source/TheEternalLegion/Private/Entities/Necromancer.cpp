@@ -4,6 +4,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "Entities/Necromancer.h"
+#include "Entities/Minion.h"
 #include "Components/PlayerMovementStrategy.h"
 #include "AIController.h"
 #include "Components/InputProcessorComponent.h"
@@ -53,20 +54,17 @@ void ANecromancer::SummonMinion()
         FActorSpawnParameters SpawnParams;
         SpawnParams.Owner = this;
 
-        ABaseUnit* NewMinion = World->SpawnActor<ABaseUnit>(MinionClass, SpawnLocation, SpawnRotation, SpawnParams);
+        AMinion* NewMinion = World->SpawnActor<AMinion>(MinionClass, SpawnLocation, SpawnRotation, SpawnParams);
 
         if (NewMinion)
         {
             NewMinion->SetTeam(ETeam::Player);
+			NewMinion->SetOwnerUnit(this);
             GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Purple, TEXT("Minion Summoned!"));
 
-            if (AAIController* AIC = Cast<AAIController>(NewMinion->GetController()))
+            if (NewMinion->GetMovementStrategy())
             {
-                // Option A: Move to the Necromancer (Follow)
-                AIC->MoveToActor(this, 50.0f); // 50.0f is the "Acceptance Radius"
-
-                // Option B: Move to a specific point (Target Location)
-                // AIC->MoveToLocation(TargetLocation);
+                NewMinion->GetMovementStrategy()->UpdateMovement(NewMinion, this);
             }
         }
     }
