@@ -61,7 +61,7 @@ protected:
 	);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Combat")
-	float AttackRange = 150.0f;
+	float AttackRange = 200.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Combat")
 	float AttackDamage = 10.0f;

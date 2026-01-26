@@ -11,7 +11,7 @@ AMinion::AMinion()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	CurrentTeam = ETeam::Enemy;
+	CurrentTeam = ETeam::Neutral;
 	MovementStrategy = CreateDefaultSubobject<UMinionMovementStrategy>(TEXT("MovementStrategy"));
 	AggroRange = 500.0f;
 
@@ -83,6 +83,7 @@ void AMinion::SetCurrentTarget(ABaseUnit* NewTarget)
 {
 	CurrentTarget = NewTarget;
 
+
 	// - If target is owner -> Following
 	// - If target is non-null and not owner -> Attacking
 	// - If null -> Idle
@@ -135,6 +136,17 @@ void AMinion::OnDetectionBeginOverlap(
 	const FHitResult& SweepResult
 )
 {
+	#if WITH_EDITOR
+		if (GEngine)
+		{
+			const FString Msg = FString::Printf(
+				TEXT("Overlap Begin: %s (%s)"),
+				OtherActor ? *OtherActor->GetName() : TEXT("NULL"),
+				OtherActor ? *OtherActor->GetClass()->GetName() : TEXT("None")
+			);
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Cyan, Msg);
+		}
+	#endif
 	if (!OtherActor || OtherActor == this)
 	{
 		return;

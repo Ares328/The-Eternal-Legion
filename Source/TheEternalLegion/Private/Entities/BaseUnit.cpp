@@ -18,14 +18,26 @@ ABaseUnit::ABaseUnit()
 void ABaseUnit::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	#if WITH_EDITOR
+		if (GEngine)
+		{
+			const FString Msg = FString::Printf(
+				TEXT("%s spawned with Team: %d"),
+				*GetName(),
+				static_cast<int32>(CurrentTeam)
+			);
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, Msg);
+		}
+	#endif
+
+	CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
+	bIsDead = (CurrentHealth <= 0.0f);
 }
 
 // Called every frame
 void ABaseUnit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ABaseUnit::SetTeam(ETeam NewTeam)
