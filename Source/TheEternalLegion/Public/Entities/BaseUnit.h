@@ -52,6 +52,8 @@ protected:
 
 	virtual void HandleDeath();
 
+	virtual void OnDamaged(ABaseUnit* DamageCauser);
+
 public:
 	// The main function to call when converting a unit
 	UFUNCTION(BlueprintCallable, Category = "Legion | Actions")

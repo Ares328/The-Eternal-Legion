@@ -66,6 +66,8 @@ void ABaseUnit::ApplyDamage(float DamageAmount, ABaseUnit* DamageCauser)
 
 	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.0f, MaxHealth);
 
+	OnDamaged(DamageCauser);
+
 	if (CurrentHealth <= 0.0f)
 	{
 		HandleDeath();
@@ -93,5 +95,10 @@ void ABaseUnit::HandleDeath()
 
 	OnUnitDeath.Broadcast(this);
 
-	SetLifeSpan(5.0f);
+	Destroy();
+}
+
+void ABaseUnit::OnDamaged(ABaseUnit* DamageCauser)
+{
+	// Base does nothing
 }

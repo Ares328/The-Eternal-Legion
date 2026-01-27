@@ -60,6 +60,8 @@ protected:
 		int32 OtherBodyIndex
 	);
 
+	void HandleActorEnteredDetection(AActor* OtherActor);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Combat")
 	float AttackRange = 200.0f;
 
@@ -69,6 +71,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Combat")
 	float AttackInterval = 1.0f;
 
+	UPROPERTY() 
+	TArray<TObjectPtr<ABaseUnit>> EnemiesInRange;
+
+	ABaseUnit* FindBestEnemyTarget() const;
+
+	void ScanInitialOverlaps();
+
 	FTimerHandle AttackTimerHandle;
 
 	UFUNCTION()
@@ -76,6 +85,10 @@ protected:
 
 	void StartAttack();
 	void StopAttack();
+
+	virtual void OnDamaged(ABaseUnit* DamageCauser) override;
+
+	virtual void BeginPlay() override;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Legion | AI")
