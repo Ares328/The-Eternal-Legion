@@ -8,6 +8,8 @@
 #include "Components/PlayerMovementStrategy.h"
 #include "AIController.h"
 #include "Components/InputProcessorComponent.h"
+#include "Blueprint/UserWidget.h"
+#include "UObject/ConstructorHelpers.h"
 
 ANecromancer::ANecromancer()
 {
@@ -16,6 +18,52 @@ ANecromancer::ANecromancer()
     CurrentTeam = ETeam::Player;
 
     ConversionRange = 1000.0f;
+}
+
+void ANecromancer::BeginPlay()
+{
+    Super::BeginPlay();
+
+    #if WITH_EDITOR
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(
+                -1, 3.0f, FColor::Green,
+                FString::Printf(TEXT("Necromancer BeginPlay, Controller=%s"),
+                    *GetNameSafe(GetController()))
+            );
+        }
+    #endif
+
+    if (APlayerController* PC = Cast<APlayerController>(GetController()))
+    {
+        static TSubclassOf<UUserWidget> MinionCommandsClass;
+
+        #if WITH_EDITOR
+                if (GEngine)
+                {
+                    GEngine->AddOnScreenDebugMessage(
+                        -1, 3.0f, FColor::Cyan,
+                        TEXT("Necromancer has PlayerController, creating UI"));
+                }
+        #endif
+
+        if (!MinionCommandsClass)
+        {
+            MinionCommandsClass = LoadClass<UUserWidget>(
+                nullptr,
+                TEXT("/Game/UI/WBP_MinionCommands.WBP_MinionCommands_C")
+            );
+        }
+
+        if (MinionCommandsClass)
+        {
+            if (UUserWidget* Widget = CreateWidget<UUserWidget>(PC, MinionCommandsClass))
+            {
+                Widget->AddToViewport();
+            }
+        }
+    }
 }
 
 void ANecromancer::ConvertTarget()
@@ -62,10 +110,70 @@ void ANecromancer::SummonMinion()
 			NewMinion->SetOwnerUnit(this);
             GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Purple, TEXT("Minion Summoned!"));
 
+            ControlledMinions.Add(NewMinion);
+
+            NewMinion->OnUnitDeath.AddDynamic(this, &ANecromancer::OnControlledMinionDeath);
+            
             if (NewMinion->GetMovementStrategy())
             {
                 NewMinion->GetMovementStrategy()->UpdateMovement(NewMinion, this);
             }
         }
+    }
+}
+
+void ANecromancer::OnControlledMinionDeath(ABaseUnit* DeadUnit)
+{
+    if (!DeadUnit)
+    {
+        return;
+    }
+
+    AMinion* DeadMinion = Cast<AMinion>(DeadUnit);
+    if (!DeadMinion)
+    {
+        return;
+    }
+
+    ControlledMinions.Remove(DeadMinion);
+
+    #if WITH_EDITOR
+        if (GEngine)
+        {
+            const FString Msg = FString::Printf(
+                TEXT("Necromancer: Minion %s died, remaining: %d"),
+                *DeadMinion->GetName(),
+                ControlledMinions.Num()
+            );
+            GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, Msg);
+        }
+    #endif
+}
+
+void ANecromancer::CommandMinionsIncreaseAggro()
+{
+    for (AMinion* Minion : ControlledMinions)
+    {
+        if (!IsValid(Minion))
+        {
+            continue;
+        }
+
+        const float NewRange = Minion->GetAggroRange() + AggroRangeStep;
+        Minion->SetAggroRange(NewRange);
+    }
+}
+
+void ANecromancer::CommandMinionsDecreaseAggro()
+{
+    for (AMinion* Minion : ControlledMinions)
+    {
+        if (!IsValid(Minion))
+        {
+            continue;
+        }
+
+        const float NewRange = FMath::Max(0.0f, Minion->GetAggroRange() - AggroRangeStep);
+        Minion->SetAggroRange(NewRange);
     }
 }

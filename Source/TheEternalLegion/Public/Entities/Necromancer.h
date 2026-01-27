@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Entities/BaseUnit.h"
+#include "Entities/Minion.h"
 #include "Necromancer.generated.h"
 
 class UInputProcessorComponent;
@@ -26,6 +27,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Legion | Abilities")
 	void ConvertTarget();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Minions")
+	float AggroRangeStep = 200.0f;
+
+	UFUNCTION(BlueprintCallable, Category = "Legion | Minions")
+	void CommandMinionsIncreaseAggro();
+
+	UFUNCTION(BlueprintCallable, Category = "Legion | Minions")
+	void CommandMinionsDecreaseAggro();
+
+	void BeginPlay() override;
+
 private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Legion | Input", meta = (AllowPrivateAccess = "true"))
@@ -34,4 +46,10 @@ private:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Abilities")
 	TSubclassOf<class ABaseUnit> MinionClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Legion | Minions")
+	TArray<TObjectPtr<AMinion>> ControlledMinions;
+
+	UFUNCTION()
+	void OnControlledMinionDeath(ABaseUnit* DeadUnit);
 };
