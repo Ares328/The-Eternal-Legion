@@ -39,6 +39,12 @@ protected:
     UPROPERTY(EditAnywhere, Category = "Legion | Input | Actions")
     UInputAction* IA_Convert;
 
+    UPROPERTY(EditAnywhere, Category = "Legion | Input | Actions")
+    UInputAction* IA_Minion_Attack;
+
+    UPROPERTY(EditAnywhere, Category = "Legion | Input | Actions")
+    UInputAction* IA_Minion_Defend;
+
     UPROPERTY(EditDefaultsOnly, Category = "Legion | Input | Actions")
     class UInputMappingContext* DefaultIMC;
 
@@ -48,6 +54,9 @@ protected:
 
     void HandleSummon();
     void HandleConvert();
+
+	void HandleMinionAttack();
+	void HandleMinionDefend();
 
     void SetupInputBindings();
 };

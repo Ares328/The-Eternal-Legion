@@ -65,11 +65,18 @@ void UInputProcessorComponent::SetupInputBindings()
         {
             EnhancedInputComponent->BindAction(IA_Summon, ETriggerEvent::Started, this, &UInputProcessorComponent::HandleSummon);
         }
-
         if (IA_Convert)
         {
             EnhancedInputComponent->BindAction(IA_Convert, ETriggerEvent::Started, this, &UInputProcessorComponent::HandleConvert);
         }
+        if (IA_Minion_Attack)
+        {
+            EnhancedInputComponent->BindAction(IA_Minion_Attack, ETriggerEvent::Started, this, &UInputProcessorComponent::HandleMinionAttack);
+		}
+        if (IA_Minion_Defend)
+        {
+            EnhancedInputComponent->BindAction(IA_Minion_Defend, ETriggerEvent::Started, this, &UInputProcessorComponent::HandleMinionDefend);
+		}
     }
 }
 
@@ -151,5 +158,21 @@ void UInputProcessorComponent::HandleConvert()
     if (ANecromancer* Owner = Cast<ANecromancer>(GetOwner()))
     {
         Owner->ConvertTarget();
+    }
+}
+
+void UInputProcessorComponent::HandleMinionAttack()
+{
+    if (ANecromancer* Owner = Cast<ANecromancer>(GetOwner()))
+    {
+        Owner->CommandMinionsIncreaseAggro();
+    }
+}
+
+void UInputProcessorComponent::HandleMinionDefend()
+{
+    if (ANecromancer* Owner = Cast<ANecromancer>(GetOwner()))
+    {
+        Owner->CommandMinionsDecreaseAggro();
     }
 }

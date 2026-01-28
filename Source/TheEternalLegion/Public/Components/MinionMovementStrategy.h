@@ -16,4 +16,7 @@ class THEETERNALLEGION_API UMinionMovementStrategy : public UMovementStrategy
 public:
 
 	virtual void UpdateMovement(ABaseUnit* Unit, ABaseUnit* Target) override;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	UAnimMontage* WalkMontage;
 };
