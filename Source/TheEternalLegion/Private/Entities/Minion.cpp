@@ -395,6 +395,27 @@ void AMinion::PerformAttack()
 		return;
 	}
 
+	if (this)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s is performing a melee attack!!"), *this->GetName());
+		if (AttackMontage)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s is performing a animation!!"), *this->GetName());
+			UAnimInstance* AnimInstance = this->GetMesh()->GetAnimInstance();
+			if (AnimInstance)
+			{
+				int32 RandomIndex = FMath::RandRange(1, 3);
+
+				FName SectionName = FName(*FString::Printf(TEXT("Melee0%d"), RandomIndex));
+
+				AnimInstance->Montage_Play(AttackMontage, 1.0f);
+				AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
+
+				UE_LOG(LogTemp, Log, TEXT("Playing Section: %s"), *SectionName.ToString());
+			}
+		}
+	}
+
 	CurrentTarget->ApplyDamage(AttackDamage, this);
 
 	#if WITH_EDITOR

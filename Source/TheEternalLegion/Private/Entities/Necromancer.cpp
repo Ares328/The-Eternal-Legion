@@ -5,10 +5,12 @@
 #include "InputAction.h"
 #include "Entities/Necromancer.h"
 #include "Entities/Minion.h"
+#include "Entities/BaseUnit.h"
 #include "Components/PlayerMovementStrategy.h"
 #include "AIController.h"
 #include "Components/InputProcessorComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/MinionCommandsWidget.h"
 #include "UObject/ConstructorHelpers.h"
 
 ANecromancer::ANecromancer()
@@ -18,6 +20,7 @@ ANecromancer::ANecromancer()
     CurrentTeam = ETeam::Player;
 
     ConversionRange = 1000.0f;
+    MinionCommandsWidget = nullptr;
 }
 
 void ANecromancer::BeginPlay()
@@ -58,9 +61,10 @@ void ANecromancer::BeginPlay()
 
         if (MinionCommandsClass)
         {
-            if (UUserWidget* Widget = CreateWidget<UUserWidget>(PC, MinionCommandsClass))
+            MinionCommandsWidget = CreateWidget<UMinionCommandsWidget>(PC, MinionCommandsClass);
+            if (MinionCommandsWidget)
             {
-                Widget->AddToViewport();
+                MinionCommandsWidget->AddToViewport();
             }
         }
     }
@@ -76,13 +80,50 @@ void ANecromancer::ConvertTarget()
     FCollisionQueryParams QueryParams;
     QueryParams.AddIgnoredActor(this);
 
-    if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, QueryParams))
+    const bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, QueryParams);
+
+    if (bHit)
     {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(
+                -1, 2.f, FColor::Yellow,
+                FString::Printf(TEXT("ConvertTarget: Hit %s (class %s)"),
+                    *GetNameSafe(Hit.GetActor()),
+                    *GetNameSafe(Hit.GetActor() ? Hit.GetActor()->GetClass() : nullptr))
+            );
+        }
+
         ABaseUnit* TargetUnit = Cast<ABaseUnit>(Hit.GetActor());
         if (TargetUnit)
         {
             TargetUnit->SetTeam(ETeam::Player);
             GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, TEXT("Unit Converted!"));
+
+            if (MinionCommandsWidget)
+            {
+                MinionCommandsWidget->OnConvertTriggered();
+            }
+        }
+        else
+        {
+            if (GEngine)
+            {
+                GEngine->AddOnScreenDebugMessage(
+                    -1, 2.f, FColor::Red,
+                    TEXT("ConvertTarget: Hit actor is NOT an ABaseUnit")
+                );
+            }
+        }
+    }
+    else
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(
+                -1, 2.f, FColor::Red,
+                TEXT("ConvertTarget: No hit")
+            );
         }
     }
 
@@ -108,6 +149,7 @@ void ANecromancer::SummonMinion()
         {
             NewMinion->SetTeam(ETeam::Player);
 			NewMinion->SetOwnerUnit(this);
+			NewMinion->SetAggroRange(GetMinionAggroRange());
             GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Purple, TEXT("Minion Summoned!"));
 
             ControlledMinions.Add(NewMinion);
@@ -117,6 +159,11 @@ void ANecromancer::SummonMinion()
             if (NewMinion->GetMovementStrategy())
             {
                 NewMinion->GetMovementStrategy()->UpdateMovement(NewMinion, this);
+            }
+
+            if (MinionCommandsWidget)
+            {
+                MinionCommandsWidget->OnSummonTriggered();
             }
         }
     }
@@ -161,6 +208,12 @@ void ANecromancer::CommandMinionsIncreaseAggro()
 
         const float NewRange = Minion->GetAggroRange() + AggroRangeStep;
         Minion->SetAggroRange(NewRange);
+
+        if (MinionCommandsWidget)
+        {
+            MinionCommandsWidget->OnAttackTriggered();
+            MinionCommandsWidget->SetAggroRange(NewRange);
+        }
     }
 }
 
@@ -175,5 +228,59 @@ void ANecromancer::CommandMinionsDecreaseAggro()
 
         const float NewRange = FMath::Max(0.0f, Minion->GetAggroRange() - AggroRangeStep);
         Minion->SetAggroRange(NewRange);
+
+        if (MinionCommandsWidget)
+        {
+            MinionCommandsWidget->OnDefendTriggered();
+            MinionCommandsWidget->SetAggroRange(NewRange);
+        }
     }
+}
+
+float ANecromancer::GetMinionAggroRange() const
+{
+    if (ControlledMinions.Num() == 0)
+    {
+        return 0.0f;
+    }
+
+    float Sum = 0.0f;
+    int32 Count = 0;
+
+    for (AMinion* Minion : ControlledMinions)
+    {
+        if (!IsValid(Minion))
+        {
+            continue;
+        }
+
+        Sum += Minion->GetAggroRange();
+        ++Count;
+    }
+
+    return (Count > 0) ? (Sum / Count) : 0.0f;
+}
+
+void ANecromancer::UpdateHealthOnWidget()
+{
+    if (!MinionCommandsWidget)
+    {
+        return;
+    }
+
+    const float Current = CurrentHealth;
+    const float Max = MaxHealth;
+
+    const float Percent = (Max > 0.0f)
+        ? FMath::Clamp(Current / Max, 0.0f, 1.0f)
+        : 0.0f;
+
+    MinionCommandsWidget->SetHealthPercentage(Percent);
+}
+
+void ANecromancer::OnDamaged(ABaseUnit* DamageCauser)
+{
+    Super::OnDamaged(DamageCauser);
+
+    UpdateHealthOnWidget();
 }

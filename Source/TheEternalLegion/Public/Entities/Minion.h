@@ -88,6 +88,9 @@ protected:
 
 	virtual void OnDamaged(ABaseUnit* DamageCauser) override;
 
+	UPROPERTY(EditAnywhere, Category = "Legion | Effects")
+	UAnimMontage* AttackMontage;
+
 	virtual void BeginPlay() override;
 
 public:
